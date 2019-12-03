@@ -23,7 +23,7 @@ function getMinSteps(array1, array2, intersections) {
     let sumOfSteps =
       parseInt(array1.indexOf(point)) + parseInt(array2.indexOf(point));
 
-    minSteps = sumOfSteps < minSteps ? sumOfSteps : minSteps;
+    minSteps = sumOfSteps < minSteps && sumOfSteps > 0 ? sumOfSteps : minSteps;
   });
 
   return minSteps;
