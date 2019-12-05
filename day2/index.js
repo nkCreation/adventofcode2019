@@ -1,4 +1,5 @@
-const { data } = require("./input.json");
+import { IntCodeProgram } from '../utils/utils';
+import { data } from './input.json';
 
 console.log(calculateWithInputs(12, 2, [...data]));
 console.log(findRightInputs(19690720));
@@ -23,23 +24,5 @@ function calculateWithInputs(inputOne, inputTwo, memory) {
   memory[1] = inputOne;
   memory[2] = inputTwo;
 
-  return program(memory)[0];
-}
-
-function program(array) {
-  for (let index = 0; index < array.length; index += 4) {
-    const action = array[index];
-
-    if (action === 99) break;
-
-    const inputs = [array[array[index + 1]], array[array[index + 2]]];
-    array[array[index + 3]] =
-      action === 1
-        ? inputs.reduce((a, b) => a + b, 0)
-        : action === 2
-        ? inputs.reduce((a, b) => a * b, 1)
-        : array[array[index + 3]];
-  }
-
-  return array;
+  return IntCodeProgram(memory)[0];
 }
