@@ -13,24 +13,31 @@ const wire2points = generateAllPoints(data[1]);
 
 const commonPoints = findIntersections(wire1points, wire2points);
 
-console.log(sortToFindClosest([...commonPoints])[1]);
+console.log(sortToFindClosest([...commonPoints])[0]);
 console.log(getMinSteps(wire1points, wire2points, commonPoints));
 
-function getMinSteps(array1, array2, intersections) {
+function getMinSteps(map1, map2, intersections) {
   let minSteps = Infinity;
 
   intersections.forEach(point => {
-    let sumOfSteps =
-      parseInt(array1.indexOf(point)) + parseInt(array2.indexOf(point));
+    let sumOfSteps = parseInt(map1.get(point)) + parseInt(map2.get(point));
 
-    minSteps = sumOfSteps < minSteps && sumOfSteps > 0 ? sumOfSteps : minSteps;
+    minSteps = sumOfSteps < minSteps ? sumOfSteps : minSteps;
   });
 
   return minSteps;
 }
 
-function findIntersections(array1, array2) {
-  return array1.filter(value => array2.includes(value));
+function findIntersections(map1, map2) {
+  const cp = [];
+
+  for (const key of map1.keys()) {
+    if (map2.has(key)) {
+      cp.push(key);
+    }
+  }
+
+  return cp;
 }
 
 function sortToFindClosest(array) {
@@ -46,57 +53,31 @@ function sortToFindClosest(array) {
 }
 
 function generateAllPoints(wire) {
-  return wire.split(",").reduce(
-    (acc, val) => {
-      const coords = acc[acc.length - 1].split(",");
-      const oldX = parseInt(coords[0]);
-      const oldY = parseInt(coords[1]);
-      const moveType = val.split("").splice(0, 1)[0];
-      const distance = parseInt(val.replace(moveType, ""));
+  const instructions = wire.split(",");
+  const points = new Map();
 
-      for (let i = 1; i <= distance; i++) {
-        if (moveType === "R") {
-          acc.push(`${oldX + i},${oldY}`);
-        } else if (moveType === "L") {
-          acc.push(`${oldX - i},${oldY}`);
-        } else if (moveType === "D") {
-          acc.push(`${oldX},${oldY + i}`);
-        } else if (moveType === "U") {
-          acc.push(`${oldX},${oldY - i}`);
-        }
-      }
+  let oldX = 0,
+    oldY = 0,
+    moves = 1;
 
-      acc.pus;
+  instructions.map(val => {
+    const moveType = val.split("").splice(0, 1)[0];
+    const distance = parseInt(val.replace(moveType, ""));
 
-      return acc;
-    },
-    ["0,0"]
-  );
-}
-
-function generateMajorPoints(wire) {
-  return wire.split(",").reduce(
-    (acc, val) => {
-      const coords = acc[acc.length - 1].split(",");
-      const oldX = parseInt(coords[0]);
-      const oldY = parseInt(coords[1]);
-      const moveType = val.split("").splice(0, 1)[0];
-      const distance = parseInt(val.replace(moveType, ""));
-
+    for (let i = 1; i <= distance; i++) {
       if (moveType === "R") {
-        acc.push(`${oldX + i},${oldY}`);
+        oldX++;
       } else if (moveType === "L") {
-        acc.push(`${oldX - i},${oldY}`);
+        oldX--;
       } else if (moveType === "D") {
-        acc.push(`${oldX},${oldY + i}`);
+        oldY++;
       } else if (moveType === "U") {
-        acc.push(`${oldX},${oldY - i}`);
+        oldY--;
       }
 
-      acc.pus;
+      points.set(`${oldX},${oldY}`, moves++);
+    }
+  });
 
-      return acc;
-    },
-    ["0,0"]
-  );
+  return points;
 }
