@@ -6,17 +6,10 @@
 // v
 // y
 
+const begin = Date.now();
 const { data } = require("./input.json");
 
-const wire1points = generateAllPoints(data[0]);
-const wire2points = generateAllPoints(data[1]);
-
-const commonPoints = findIntersections(wire1points, wire2points);
-
-console.log(sortToFindClosest([...commonPoints])[0]);
-console.log(getMinSteps(wire1points, wire2points, commonPoints));
-
-function getMinSteps(map1, map2, intersections) {
+const getMinSteps = (map1, map2, intersections) => {
   let minSteps = Infinity;
 
   intersections.forEach(point => {
@@ -26,21 +19,19 @@ function getMinSteps(map1, map2, intersections) {
   });
 
   return minSteps;
-}
+};
 
-function findIntersections(map1, map2) {
-  const cp = [];
-
-  for (const key of map1.keys()) {
+const findIntersections = (map1, map2) => {
+  return Array.from(map1.keys()).reduce((acc, key) => {
     if (map2.has(key)) {
-      cp.push(key);
+      acc.push(key);
     }
-  }
 
-  return cp;
-}
+    return acc;
+  }, []);
+};
 
-function sortToFindClosest(array) {
+const sortToFindClosest = array => {
   return array.sort((a, b) => {
     let Acoords = a.split(",");
     let Bcoords = b.split(",");
@@ -50,9 +41,9 @@ function sortToFindClosest(array) {
       (Math.abs(parseInt(Bcoords[0])) + Math.abs(parseInt(Bcoords[1])))
     );
   });
-}
+};
 
-function generateAllPoints(wire) {
+const generateAllPoints = wire => {
   const instructions = wire.split(",");
   const points = new Map();
 
@@ -64,15 +55,20 @@ function generateAllPoints(wire) {
     const moveType = val.split("").splice(0, 1)[0];
     const distance = parseInt(val.replace(moveType, ""));
 
-    for (let i = 1; i <= distance; i++) {
-      if (moveType === "R") {
-        oldX++;
-      } else if (moveType === "L") {
-        oldX--;
-      } else if (moveType === "D") {
-        oldY++;
-      } else if (moveType === "U") {
-        oldY--;
+    for (let i = 0; i < distance; i++) {
+      switch (moveType) {
+        case "R":
+          oldX++;
+          break;
+        case "L":
+          oldX--;
+          break;
+        case "D":
+          oldY++;
+          break;
+        case "U":
+          oldY--;
+          break;
       }
 
       points.set(`${oldX},${oldY}`, moves++);
@@ -80,4 +76,14 @@ function generateAllPoints(wire) {
   });
 
   return points;
-}
+};
+
+const wire1points = generateAllPoints(data[0]);
+const wire2points = generateAllPoints(data[1]);
+
+const commonPoints = findIntersections(wire1points, wire2points);
+
+console.log(sortToFindClosest([...commonPoints])[0]);
+console.log(getMinSteps(wire1points, wire2points, commonPoints));
+
+console.log(Date.now() - begin);
